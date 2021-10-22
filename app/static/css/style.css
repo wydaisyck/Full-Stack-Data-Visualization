@@ -1,0 +1,205 @@
+
+/*更改标题栏宽度和字体*/
+.navbar-nav > li > a{
+    padding-top: 20px;
+    padding-bottom: 15px;
+    height: 60px;
+	font-family: 'Josefin Sans', sans-serif;
+    font-weight: bold;
+	font-size: 15px;
+}
+
+.navbar-brand {
+    padding-top: 20px;
+    padding-bottom: 15px;
+    padding-right: 30px;
+    height: 60px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: bold;
+	font-size: 16px;
+}
+
+
+#dateSearch{
+    font-family: 'Josefin Sans', sans-serif;
+	font-size: 14px;}
+
+
+#left1{
+    position: absolute;
+    width:63%;
+    height:52%;
+    top:13%;
+    left:2.5%;
+    margin: 0px 0px 0px 0px;
+}
+
+#mychart{
+    position: absolute;
+    width:99%;
+    height:95%;
+    top:2%;
+    left:0%;
+    margin: 0px 0px 0px 0px;
+}
+
+#left2{
+    position: absolute;
+    width:50%;
+    height:48%;
+    top:64%;
+    left:8%;
+    margin: 0px 0px 0px 0px;
+}
+
+
+#right1{
+    position: absolute;
+    width:30%;
+    height:90%;
+    top: 8%;
+    right:4%;
+    bottom: 15%;
+    margin: 0px 0px 0px 0px;
+}
+
+#right2{
+    position: absolute;
+    width:95%;
+    height:90%;
+    top: 8%;
+    right:0%;
+    bottom: 5%;
+    margin: 0px 0px 0px 0px;
+}
+
+
+
+#keywords thead {
+  cursor: pointer;
+  background: #c9dff0;
+}
+#keywords thead tr th {
+  font-weight: bold;
+}
+#keywords thead tr th span {
+  padding-right: 20px;
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+}
+#keywords thead tr th.headerSortUp, #keywords thead tr th.headerSortDown {
+  background: #bebec5;
+}
+#keywords thead tr th.headerSortUp span {
+  background-image: url(../up.png);
+}
+#keywords thead tr th.headerSortDown span {
+  background-image: url(../down.png);
+}
+#keywords thead tr th.sortUpBefore, #keywords thead tr th.sortDownBefore{}
+
+
+#keywords2 thead {
+  cursor: pointer;
+  background: #c9dff0;
+}
+#keywords2 thead tr th {
+  font-weight: bold;
+}
+#keywords2 thead tr th span {
+  padding-right: 20px;
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+}
+#keywords2 thead tr th.headerSortUp, #keywords2 thead tr th.headerSortDown {
+  background: #bebec5;
+}
+#keywords2 thead tr th.headerSortUp span {
+  background-image: url(../up.png);
+}
+#keywords2 thead tr th.headerSortDown span {
+  background-image: url(../down.png);
+}
+#keywords2 thead tr th.sortUpBefore, #keywords2 thead tr th.sortDownBefore{}
+
+
+#inputCN{
+	background:none;
+	outline:none;
+	border:1px solid #ccc;
+}
+
+#inputCN :focus{
+border:none;
+}
+
+
+table thead th{
+
+    text-align:center;
+    font-size: 14px;
+}
+
+
+table td {
+    vertical-align:text-top;
+}
+
+table tbody {
+    text-align:center;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 14px;
+}
+
+
+
+.mypics {
+    display: table;
+    float: left;
+    width: 45%;    //将5张图片并排 排列
+    text-align: center;
+    margin-left: 4%;
+}
+
+.mypics img{
+     margin: auto;
+}
+
+.mypics h2{
+    text-align:center;
+}
+
+
+#saveselect {
+    margin-left: 4%;
+    width: 50%;
+}
+
+
+#saveselect span{
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 16px;
+    color: #3f535c;
+    margin-top: -3%;
+
+}
+
+
+#saveselect select{
+    border: 1px solid #DADADA;
+    color: #3f535c;
+    margin-bottom: 5px;
+    margin-right: 6px;
+    margin-top: 3px;
+    outline: 0 none;
+    padding: 3px 3px 3px 5px;  /*字的边界*/
+    width: 100%;
+    font-size: 15px;
+    line-height:20px;
+    box-shadow: inset 0px 1px 4px #ECECEC;
+    -moz-box-shadow: inset 0px 1px 4px #ECECEC;
+    -webkit-box-shadow: inset 0px 1px 4px #ECECEC;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}

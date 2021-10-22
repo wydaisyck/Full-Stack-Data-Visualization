@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ANZHI FLASK</title>
+    <link href="../static/css/zui.min.css" rel="stylesheet">
+    <link href="../static/css/zui-theme.css" rel="stylesheet">
+    <link href="../static/css/style.css" rel="stylesheet">
+    <link href="../static/lib/datetimepicker/datetimepicker.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="#" />
+    <script src="../static/lib/datetimepicker/datetimepicker.min.js"></script>
+    <script src="../static/laydate/laydate.js"></script>
+    <script src="../static/js/jquery-1.11.1.min.js"></script>
+    <script src="../static/js/zui.min.js"></script>
+    <script src="../static/lib/colorset.js/zui.colorset.min.js"></script>
+    <script src='../static/js/jquery.tablesorter.min.js'></script>
+    <script src='../static/js/echarts.min.js'></script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid" style="width:90%; margin:0 auto;"> <!--两端对齐并且居中-->
+        <!-- 导航头部 -->
+        <div class="navbar-header">
+            <!-- 移动设备上的导航切换按钮 -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- 品牌名称或logo -->
+            <a class="navbar-brand">ANZHI</a>
+        </div>
+        <!-- 导航项目 -->
+        <div class="collapse navbar-collapse navbar-collapse-example">
+            <!-- 一般导航项目 -->
+            <ul class="nav navbar-nav">
+
+                <li class="active"><a href="{{ url_for('createindex', paraname=para_name_list[0]) }}">{{ para_name_list[0] }}</a></li>
+            {% for name in para_name_list[1:] %}
+                <li><a href="{{ url_for('createindex', paraname=name) }}">{{ name }}</a></li>
+                {% endfor %}
+
+
+                <li><a href="{{ url_for('guiyinpics', allname=dict_keys[0]) }}">{{ dict_keys[0] }}</a></li>
+                {% for key in dict_keys[1:] %}
+                    <li><a href="{{ url_for('guiyinpics', allname=key) }}">{{ key }}</a></li>
+                {% endfor %}
+
+            </ul>
+        </div><!-- END .navbar-collapse -->
+    </div>
+</nav>
+
+
+<div class="input-group" style="width:16%; margin-left: 30px;" id="dateSearchBox">
+  <div class="input-control search-box search-box-circle has-icon-left has-icon-right search-example">
+    <input id="dateSearch" type="search" class="form-control search-input" placeholder="请选择日期" style="height: 40px;">
+    <label for="dateSearch" class="input-control-icon-left search-icon" style="margin-top: 5px;"><i class="icon icon-search" ></i></label>
+  </div>
+  <span class="input-group-btn">
+    <button class="btn btn-primary" type="button" style="height: 40px;" id="dateSearchButton">查询</button>
+  </span>
+</div>
+
+
+<div id = "left1">
+    <div id = "mychart"></div>
+</div>
+
+
+
+<div id="left2">
+ <table class="table table-striped" id="keywords2">
+     <thead>
+     <tr>
+         <th><span>组别/指标</span></th>
+         <th><span>年化收益率</span></th>
+         <th><span>夏普比率</span></th>
+         <th><span>最大回撤值</span></th>
+         <th><span>回撤时间段</span></th>
+         <th><span>收益回撤比</span></th>
+     </tr>
+     </thead>
+     <tbody id="test">
+     </tbody>
+ </table>
+
+</div>
+
+<div id="right1" >
+    <h1 style="text-align:center;">排序结果</h1>
+    <div id="right2" style="overflow-y: scroll;" >
+ <table class="table table-striped" id="keywords">
+     <thead>
+     <tr>
+         <th><span>字段名称</span></th>
+         <th><span>年化收益率</span></th>
+         <th><span>收益回撤比</span></th>
+     </tr>
+     </thead>
+     <tbody id="test2">
+     </tbody>
+ </table>
+</div>
+</div>
+
+</body>
+
+
+
+<script>
+
+
+    $(function () {
+        $(".navbar-nav").find("li").each(function () {
+            var a = $(this).find("a:first")[0];
+            if ($(a).attr("href") === location.pathname) {
+                $(this).addClass("active");
+            } else {
+                $(this).removeClass("active");
+            }
+        });
+    });
+
+
+    //日期选择器
+    var inidate = {{ inidate|tojson }}
+    laydate.render({
+    elem: '#dateSearch',
+    value: inidate["inidate"],
+    range: ['#startDate-1', '#endDate-1'],
+    theme: "#607D8B",
+    min: '2013-01-04',
+    max: 'nowTime',
+    done: function(value,date){
+    }
+});
+
+
+// 初始化两表一图 日期为从当前开始的一年 字段初始化为'12m_high/low'
+var chart = echarts.init(document.getElementById('mychart'), 'white', {renderer: 'canvas'});
+$(document).ready(function(){
+	$.get("/mychart",
+			function(result) {
+				 chart.setOption(result);
+			},"json");
+    $.get("/get_table1_result",
+			function(data) {
+                var jsonData = JSON.stringify(data);// 转成JSON格式
+                var result = $.parseJSON(jsonData);// 转成JSON对象
+                var str1 = "";
+                $("#test").html("");
+                for (var i = 0; i < result.length; i++) {
+                    str1 = "<tr>" +
+                        "<td>" + result[i].group + "</td>" +
+                        "<td>" + result[i].rateByYear + "</td>" +
+                            "<td>" + result[i].sharpRatio + "</td>" +
+                            "<td>" + result[i].maxDown+ "</td>" +
+                             "<td>" + result[i].maxDownTimeTerms + "</td>" +
+                             "<td>" + (result[i].getByMaxDown)+ "</td>" +
+                        "</tr>";
+                    $("#test").append(str1);
+                }
+                $("#keywords2").trigger("update");
+			},"json");
+        $.get("/get_table2_result",
+			function(data) {
+               var jsonData = JSON.stringify(data);// 转成JSON格式
+                var result = $.parseJSON(jsonData);// 转成JSON对象
+                var str2 = "";
+                $("#test2").html("");
+                for (var j = 0; j < result.length; j++) {
+                    var sid = "";
+                    sid = 'CN' + j;
+                    str2 = "<tr>" +
+                        "<td><input style='border: none; background: none;' name='CN_id' type='button' value=" + result[j].columnName + "></td>"+
+                        "<td>" + result[j].rateByYear + "</td>" +
+                            "<td>" + result[j].getByMaxDown + "</td>" +
+                        "</tr>";
+                    $("#test2").append(str2);
+                    }
+                $("#keywords").trigger("update");
+			},"json");
+	});
+
+
+
+    // 1.从前台拿到日期传给后台
+    $("#dateSearchButton").click(function () {
+        var time = $("#dateSearch").val();
+
+        $.ajax({
+            url: "/send_time",
+            type: "GET",
+            data: {
+                time: time,
+            },
+            success: function (data) {
+                console.log(data)
+            },
+            error: function () {
+                alert("sent date message failed.")
+            }
+        })
+    });
+
+
+    // 2. 点击排序结果的字段名 传回后台重新生成表格 并且把input表格改了
+
+    $("#keywords").on("click", "input[name='CN_id']", function() {
+        var colName = $(this).val();
+        $.ajax({
+            url: "/send_colname",
+            type: "GET",
+            data: {
+                colName: colName,
+            },
+            success: function (data) {
+                console.log(data)
+            },
+            error: function () {
+                alert("sent column name message failed.")
+            }
+        })
+    });
+
+
+
+      // 从后台拿到查询结果到前台展示成图
+     $("#dateSearchButton").click(function get_chart() {
+                var chart = echarts.init(document.getElementById('mychart'), 'white', {renderer: 'canvas'});
+                $.ajax({
+                    type: "GET",
+                    url: "/mychart",
+                    dataType: 'json',
+                    success: function (result) {
+                        chart.setOption(result);
+                    }
+                });
+            }
+        );
+
+
+      // 从后台拿到查询结果到前台展示成表格1
+    $("#dateSearchButton").click(function get_sdata1() {
+        $.ajax({
+            url: "/get_table1_result",
+            contentType: "application/json; charset=UTF-8",
+            success: function (data){
+                var jsonData = JSON.stringify(data);// 转成JSON格式
+                var result = $.parseJSON(jsonData);// 转成JSON对象
+                var str1 = "";
+                $("#test").html("");
+                for (var i = 0; i < result.length; i++) {
+                    str1 = "<tr>" +
+                        "<td>" + result[i].group + "</td>" +
+                        "<td>" + result[i].rateByYear + "</td>" +
+                            "<td>" + result[i].sharpRatio + "</td>" +
+                            "<td>" + result[i].maxDown+ "</td>" +
+                             "<td>" + result[i].maxDownTimeTerms + "</td>" +
+                             "<td>" + (result[i].getByMaxDown)+ "</td>" +
+                        "</tr>";
+                    $("#test").append(str1);
+                }
+                $("#keywords2").trigger("update");
+
+            },
+
+            error:  function () {
+                alert("Can not find table1 results, please try again.")
+            }
+        });
+    });
+
+
+
+      // 从后台拿到查询结果到前台展示成表格2
+    $("#dateSearchButton").click(function get_sdata2() {
+        $.ajax({
+            url: "/get_table2_result",
+            contentType: "application/json; charset=UTF-8",
+            success: function (data){
+                var jsonData = JSON.stringify(data);// 转成JSON格式
+                var result = $.parseJSON(jsonData);// 转成JSON对象
+                var str2 = "";
+                $("#test2").html("");
+                for (var j = 0; j < result.length; j++) {
+                    var sid = "";
+                    sid = 'CN' + j;
+                    str2 = "<tr>" +
+                           // "<td class = 'tclick' id="+ sid +" cnid =" +  result[j].columnName + " >"+ result[j].columnName +"</td>" +
+                        "<td><input style='border: none; background: none;' name='CN_id' type='button' value=" + result[j].columnName + "></td>"+
+                        "<td>" + result[j].rateByYear + "</td>" +
+                            "<td>" + result[j].getByMaxDown + "</td>" +
+                        "</tr>";
+                    $("#test2").append(str2);
+                    }
+                $("#keywords").trigger("update");
+            },
+
+            error:  function () {
+                alert("Can not find table2 results, please try again.")
+            }
+        });
+    });
+
+
+
+//  把后台重新生成的表格1和图再拿回来
+
+    $("#keywords").on("click", "input[name='CN_id']", function() {
+                   var chart = echarts.init(document.getElementById('mychart'), 'white', {renderer: 'canvas'});
+                $.ajax({
+                    type: "GET",
+                    url: "/mychart",
+                    dataType: 'json',
+                    success: function (result) {
+                        chart.setOption(result);
+                    }
+                });
+            }
+        );
+
+
+
+    $("#keywords").on("click", "input[name='CN_id']", function() {
+        $.ajax({
+            url: "/get_table1_result",
+            contentType: "application/json; charset=UTF-8",
+            success: function (data){
+                var jsonData = JSON.stringify(data);// 转成JSON格式
+                var result = $.parseJSON(jsonData);// 转成JSON对象
+                var str1 = "";
+                $("#test").html("");
+                for (var i = 0; i < result.length; i++) {
+                    str1 = "<tr>" +
+                        "<td>" + result[i].group + "</td>" +
+                        "<td>" + result[i].rateByYear + "</td>" +
+                            "<td>" + result[i].sharpRatio + "</td>" +
+                            "<td>" + result[i].maxDown+ "</td>" +
+                             "<td>" + result[i].maxDownTimeTerms + "</td>" +
+                             "<td>" + (result[i].getByMaxDown)+ "</td>" +
+                        "</tr>";
+                    $("#test").append(str1);
+                }
+                $("#keywords2").trigger("update");
+            },
+            error:  function () {
+                alert("Can not find table1 results, please try again.")
+            }
+        });
+    });
+
+
+</script>
+
+</html>

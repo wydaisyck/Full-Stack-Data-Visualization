@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ANZHI FLASK</title>
+
+    <link href="../static/css/zui.min.css" rel="stylesheet">
+    <link href="../static/css/zui-theme.css" rel="stylesheet">
+    <link href="../static/css/style.css" rel="stylesheet">
+
+    <link href="../static/lib/datetimepicker/datetimepicker.min.css" rel="stylesheet">
+    <link href="../static/lib/chosen/chosen.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="#" />
+    <script src="../static/lib/chosen/chosen.min.js"></script>
+    <script src="../static/lib/datetimepicker/datetimepicker.min.js"></script>
+    <script src="../static/laydate/laydate.js"></script>
+    <script src="../static/js/jquery-1.11.1.min.js"></script>
+    <script src="../static/js/zui.min.js"></script>
+    <script src="../static/lib/colorset.js/zui.colorset.min.js"></script>
+    <script src='../static/js/jquery.tablesorter.min.js'></script>
+    <script src='../static/js/echarts.min.js'></script>
+
+
+</head>
+<body>
+
+
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid" style="width:90%; margin:0 auto;"> <!--两端对齐并且居中-->
+        <!-- 导航头部 -->
+        <div class="navbar-header">
+            <!-- 移动设备上的导航切换按钮 -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-example">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- 品牌名称或logo -->
+            <a class="navbar-brand">ANZHI</a>
+        </div>
+        <!-- 导航项目 -->
+        <div class="collapse navbar-collapse navbar-collapse-example">
+            <!-- 一般导航项目 -->
+            <ul class="nav navbar-nav">
+                <li><a href="{{ url_for('createindex', paraname=para_name_list[0]) }}">{{ para_name_list[0] }}</a></li>
+            {% for name in para_name_list[1:] %}
+                    <li><a href="{{ url_for('createindex', paraname=name) }}">{{ name }}</a></li>
+                {% endfor %}
+
+                <li class="active"><a href="{{ url_for('guiyinpics', allname=dict_keys[0]) }}">{{ dict_keys[0] }}</a></li>
+                {% for key in dict_keys[1:] %}
+                    <li><a href="{{ url_for('guiyinpics', allname=key) }}">{{ key }}</a></li>
+                {% endfor %}
+            </ul>
+        </div><!-- END .navbar-collapse -->
+    </div>
+</nav>
+
+
+<div id="saveselect">
+<label for="selecttime">
+    <span id="selectspan">请选择要查看的时间段:</span>
+    <select id="selecttime" class="chosen-select form-control" tabindex="2">
+        {% for date in datelist[:-1] %}
+  <option value="{{ date }}">{{ date }}</option>
+        {% endfor %}
+    <option selected="" value="{{ datelist[-1] }}">{{ datelist[-1] }}</option>
+</select>
+ </label>
+</div>
+
+
+<div id="showpics">
+
+
+    {% for imgs in img_stream %}
+<div class="mypics">
+        <h2>{{ imgs }}</h2>
+<img data-toggle="lightbox" src="data:image/png;base64,{{ img_stream[imgs] }}"  data-caption="{{ imgs }}" class="img-thumbnail" alt="" width="90%">
+
+</div>
+    {% endfor %}
+
+
+</div>
+
+<hr style="width:100%; float:left">
+<div style="width:100%; float:left">
+    <span>     </span>
+</div>
+
+</body>
+
+
+<script>
+
+
+
+    $("#selecttime").change(function get_model() {
+        var timeperiod = $("#selecttime").val();
+        data = {
+            timeperiod: timeperiod
+        };
+        $.ajax({
+            url: "/get_time_pics_updated",
+            type: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            success: function (data) {
+                $("#showpics").empty();
+                for (var key in data) {
+                    var pics = data[key];
+                    var str2 = "";
+                    str2 = `<div class="mypics"><h2>${key}</h2>
+<img data-toggle="lightbox" src="data:image/png;base64,${pics}" data-image="data:image/png;base64,${pics}" data-caption="${key}" class="img-thumbnail" alt="" width="90%">
+</div> `;
+                    $("#showpics").append(str2);
+                    $('.img-thumbnail').lightbox({
+                        image: `data:image/png;base64,${pics}`,
+                        caption: key,
+                    });
+                }
+                },
+
+            error: function () {
+                alert("get pics updated failed.")
+            }
+        })
+    });
+
+
+        $(function () {
+        $(".navbar-nav").find("li").each(function () {
+            var a = $(this).find("a:first")[0];
+            if ($(a).attr("href") === location.pathname) {
+                $(this).addClass("active");
+            } else {
+                $(this).removeClass("active");
+            }
+        });
+    });
+
+
+    </script>
+</html>
